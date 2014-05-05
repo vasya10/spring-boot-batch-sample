@@ -3,7 +3,7 @@ import org.springframework.batch.core.configuration.support.MapJobRegistry
 import org.springframework.batch.core.explore.support.JobExplorerFactoryBean
 import org.springframework.batch.core.launch.support.SimpleJobLauncher
 import org.springframework.batch.core.launch.support.SimpleJobOperator
-import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean
+import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean
 import org.springframework.batch.item.file.FlatFileItemWriter
 import org.springframework.batch.item.file.transform.BeanWrapperFieldExtractor
 import org.springframework.batch.item.file.transform.DelimitedLineAggregator
@@ -46,8 +46,8 @@ beans {
 
 	starItemWriter(FlatFileItemWriter) {
 		lineAggregator = new DelimitedLineAggregator(delimiter: ',',
-			fieldExtractor: new BeanWrapperFieldExtractor(names: ["contextType", "traceNumber"]))
-		resource = 'file://starcatalog-extract.txt'
+			fieldExtractor: new BeanWrapperFieldExtractor(names: ["name", "description", "distanceInLightYears"]))
+		resource = 'file:///pocspace/github/vasya10/starcatalog-extract.txt'
 	}
 
 	batch.job(id: 'starCatalogExtractJob') {
@@ -63,8 +63,9 @@ beans {
 		}
 	}
 
-	jobRepository(MapJobRepositoryFactoryBean) {
+	jobRepository(JobRepositoryFactoryBean) {
 		transactionManager = ref('transactionManager')
+		dataSource = ref('dataSource')
 	}
 
 	jobRegistry(MapJobRegistry) { }
@@ -92,6 +93,19 @@ beans {
 		jobLocator = ref('jobRegistry')
 		dataSource = ref('dataSource')
 		//tablePrefix: "${tablePrefixValue ? tablePrefixValue + '_' : ''}".toString()
+	}
+
+	h2WebServer(org.h2.tools.Server, '-web,-webAllowOthers,-trace,-webPort,8082') { bean ->
+		bean.factoryMethod = 'createWebServer'
+		bean.initMethod = 'start'
+		bean.destroyMethod = 'stop'
+	}
+
+	h2Server(org.h2.tools.Server, '-tcp,-tcpAllowOthers,-trace,-tcpPort,9092') { bean ->
+		bean.factoryMethod = 'createTcpServer'
+		bean.initMethod = 'start'
+		bean.destroyMethod = 'stop'
+		bean.dependsOn = 'h2WebServer'
 	}
 
 }

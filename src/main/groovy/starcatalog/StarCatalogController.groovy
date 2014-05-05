@@ -19,15 +19,19 @@ class StarCatalogController {
 	@RequestMapping("/starCatalog/jobs")
 	String jobs() {
 		StringBuilder stringBuilder = new StringBuilder()
-		stringBuilder.append("Current Jobs2: " + jobService.countJobs())
+		stringBuilder.append('JobCount: ').append(jobService.countJobs()).append('<br>')
+		stringBuilder.append('JobList: ').append(jobService.listJobs(0,5)).append('<br>')
+		stringBuilder.append('JobExecutions.count: ').append(jobService.countJobExecutions()).append('<br>')
+		stringBuilder.append('JobInstances.count: ').append(jobService.countJobInstances('starCatalogExtractJob')).append('<br>')
+		stringBuilder.append('StepNamesForJob: ').append(jobService.getStepNamesForJob('starCatalogExtractJob')).append('<br>')
 		return stringBuilder.toString()
 	}
 
 	@RequestMapping("/starCatalog/list")
 	String list() {
 		StringBuilder stringBuilder = new StringBuilder()
-		Star[] otcPendingTransactions = starCatalogService.findAllStars()
-		otcPendingTransactions?.each { Star star ->
+		Star[] stars = starCatalogService.findAllStars()
+		stars?.each { Star star ->
 			stringBuilder.append(star.id).append(" - ").append(star.description).append(" - ").append(star.distanceInLightYears).append('<br>')
 		}
 		return stringBuilder.toString()
