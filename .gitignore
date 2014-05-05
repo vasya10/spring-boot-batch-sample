@@ -18,3 +18,4 @@ README.html
 *.iml
 grails-app/assets/bower_components
 *.log
+*.db
