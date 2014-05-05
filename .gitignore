@@ -17,3 +17,4 @@ README.html
 .idea
 *.iml
 grails-app/assets/bower_components
+*.log
