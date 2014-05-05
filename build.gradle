@@ -1,0 +1,67 @@
+buildscript {
+	ext {
+		springBootVersion = '1.0.2.RELEASE'
+		spockVersion = '0.7-groovy-2.0'
+	}
+	repositories {
+		mavenLocal()
+		mavenCentral()
+		maven { url "http://repo.spring.io/libs-snapshot" }
+	}
+	dependencies {
+		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+	}
+}
+
+apply plugin: 'groovy'
+apply plugin: 'idea'
+apply plugin: 'spring-boot'
+apply plugin: 'project-report'
+
+jar {
+	baseName = 'spring-boot-batch-sample'
+	version = '0.1'
+}
+
+repositories {
+	mavenCentral()
+	mavenLocal()
+	maven { url "http://repo.grails.org/grails/repo" }
+}
+
+dependencies {
+	compile("org.springframework.boot:spring-boot-starter-web")
+	//if you want to use Jetty, instead of Tomcat, replace the above line with the next two lines
+	//compile("org.springframework.boot:spring-boot-starter-web:${springBootVersion}") { exclude module: "spring-boot-starter-tomcat" }
+	//compile "org.springframework.boot:spring-boot-starter-jetty:0.5.0.M2"
+	compile("org.springframework.boot:spring-boot-starter-actuator")
+	compile("org.springframework.boot:spring-boot-starter-batch")
+	compile("org.springframework.boot:spring-boot-starter-logging")
+	compile("org.springframework.boot:spring-boot-starter-jdbc")
+	compile("org.springframework.batch:spring-batch-admin-manager:1.2.2.RELEASE") {
+		exclude module: 'slf4j-log4j12'
+		exclude module: 'log4j-over-slf4j'
+	}
+	compile("org.springframework.batch:spring-batch-admin-resources:1.2.2.RELEASE") {
+		exclude module: 'slf4j-log4j12'
+		exclude module: 'log4j-over-slf4j'
+	}
+
+
+	compile("org.springframework:spring-orm:4.0.3.RELEASE")
+	compile("org.codehaus.groovy:groovy-all:2.2.2")
+	compile("org.grails:gorm-hibernate4-spring-boot:1.0.0.RC3") {
+		exclude module: 'spring-orm'
+	}
+	compile("com.github.groovy-wslite:groovy-wslite:0.8.0")
+
+	compile("org.springsource.springloaded:springloaded-core:1.1.4")
+
+	testCompile "org.springframework.boot:spring-boot-starter-test"
+	testCompile "org.spockframework:spock-core:${spockVersion}"
+	testCompile "org.spockframework:spock-spring:${spockVersion}"
+}
+
+task wrapper(type: Wrapper) {
+	gradleVersion = '1.11'
+}
