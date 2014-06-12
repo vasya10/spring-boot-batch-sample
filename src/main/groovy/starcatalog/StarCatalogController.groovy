@@ -2,38 +2,55 @@ package starcatalog
 
 import org.springframework.batch.admin.service.JobService
 import org.springframework.batch.core.launch.JobOperator
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestMethod
+import org.springframework.web.bind.annotation.ResponseBody
 import org.springframework.web.bind.annotation.RestController
 
 /**
  * Created by vsrinivasan on 3/30/2014.
  */
 @RestController
+@RequestMapping("/starcatalog")
 class StarCatalogController {
 
 	ConfigObject configObject
 	StarCatalogService starCatalogService
-	JobOperator jobOperator
-	JobService jobService
 
-	@RequestMapping("/starCatalog/jobs")
-	String jobs() {
-		StringBuilder stringBuilder = new StringBuilder()
-		stringBuilder.append('JobCount: ').append(jobService.countJobs()).append('<br>')
-		stringBuilder.append('JobList: ').append(jobService.listJobs(0,5)).append('<br>')
-		stringBuilder.append('JobExecutions.count: ').append(jobService.countJobExecutions()).append('<br>')
-		stringBuilder.append('JobInstances.count: ').append(jobService.countJobInstances('starCatalogExtractJob')).append('<br>')
-		stringBuilder.append('StepNamesForJob: ').append(jobService.getStepNamesForJob('starCatalogExtractJob')).append('<br>')
-		return stringBuilder.toString()
+	@RequestMapping("init")
+	def init() {
+		if (Star.count() == 0) {
+			starCatalogService.initializeRecords()
+		}
+
+		return "StarCatalog Records: " + Star.count()
 	}
 
-	@RequestMapping("/starCatalog/list")
-	String list() {
-		StringBuilder stringBuilder = new StringBuilder()
-		Star[] stars = starCatalogService.findAllStars()
-		stars?.each { Star star ->
-			stringBuilder.append(star.id).append(" - ").append(star.description).append(" - ").append(star.distanceInLightYears).append('<br>')
+	@RequestMapping("list")
+	@ResponseBody
+	List<Star> list() {
+		List<Star> starList = starCatalogService.findAllStars()
+
+		//ResponseBody cannot handle Jackson conversion of Domain objects out of the box
+		//other solutions: write custom mapper or disable Jackson's Serializer.FAIL_EMPTY_BEANS
+		List<Star> stars = []
+		starList.each { Star s ->
+			stars << [id: s.id, name: s.name, description: s.description, distanceInLightYears: s.distanceInLightYears, imageLink: s.imageLink]
 		}
-		return stringBuilder.toString()
+		return stars
+	}
+
+	@RequestMapping(value="create", method=RequestMethod.POST)
+	String create(@RequestBody final _star) {
+		Star star = new Star()
+		star.name = _star.name
+		star.description = _star.description
+		star.distanceInLightYears = _star.distanceInLightYears
+		star.imageLink = _star.imageLink
+
+		star.save()
+
+		return "Successfully added ${star.name} to the Catalog!"
 	}
 }

@@ -8,6 +8,7 @@ import org.springframework.batch.item.file.FlatFileItemWriter
 import org.springframework.batch.item.file.transform.BeanWrapperFieldExtractor
 import org.springframework.batch.item.file.transform.DelimitedLineAggregator
 import org.springframework.core.task.SyncTaskExecutor
+import starcatalog.BatchAdminController
 import starcatalog.StarCatalogController
 import starcatalog.StarCatalogService
 import starcatalog.StarItemProcessor
@@ -26,12 +27,15 @@ beans {
 	ctx.'annotation-config'()
 //	batch.'job-repository'()
 
+	batchAdminController(BatchAdminController) {
+		jobOperator = ref('jobOperator')
+		jobService = ref('jobService')
+	}
+
 	starCatalogService(StarCatalogService)
 
 	starCatalogController(StarCatalogController) {
 		configObject = config
-		jobOperator = ref('jobOperator')
-		jobService = ref('jobService')
 		starCatalogService = ref('starCatalogService')
 	}
 

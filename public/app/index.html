@@ -1,0 +1,45 @@
+<!doctype html>
+<html>
+<head>
+	<title>Star Catalog</title>
+	<script src="../bower_components/angular.js"></script>
+	<script src="js/csapp.js"></script>
+	<script src="js/controllers.js"></script>
+	<link href="styles/bootstrap.css" rel="stylesheet" type="text/css"/>
+</head>
+<body ng-app="csApp" class="container">
+<h1>Star Catalog</h1>
+<hr/>
+<div ng-controller="CsOrderCtrl">
+	<div class="row">
+		<div ng-repeat="s in stars" class="col-md-2 text-center">
+			<img src="{{s.imageLink}}" width="120" height="120" alt="{{s.description}}" border="3"/><br/>
+			{{s.name}}<br/>
+			{{s.description}}<br/>
+			<small>{{s.distanceInLightYears}} light years</small>
+		</div>
+	</div>
+	<form role="form" class="form-horizontal">
+		<div class="form-group">
+			<label for="name">Star Name</label>
+			<input type="text" ng-model="star.name" id="name" name="name" maxlength="16" class="form-control" required="true"/>
+			<label for="description">Description</label>
+			<input type="text" ng-model="star.description" id="description" name="description" maxlength="50" class="form-control" required="true"/>
+			<label for="description">Distance in Light Years</label>
+			<input type="number" ng-model="star.distanceInLightYears" id="distanceInLightYears" name="distanceInLightYears" maxlength="12" class="form-control" required="true"/>
+			<label for="imageLink">Image Link</label>
+			<input type="text" ng-model="star.imageLink" id="imageLink" name="imageLink" maxlength="100" class="form-control" required="true"/>
+			<hr/>
+			<input type="button" class="btn btn-primary" name="submit" ng-click="addStar()" value="Add Star"/>
+			<div class="alert-success" ng-show="lastMessage != null">
+				{{lastMessage.data}}
+			</div>
+			<div class="alert-warning" ng-show="errors != null">
+				<h3>Errors</h3>
+				{{errors}}
+			</div>
+		</div>
+	</form>
+</div>
+</body>
+</html>

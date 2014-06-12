@@ -11,6 +11,7 @@ class Star {
 	String name
 	String description
 	BigDecimal distanceInLightYears
+	String imageLink
 
 	static mapping = {
 		version false
